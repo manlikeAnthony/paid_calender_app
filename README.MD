@@ -1,140 +1,185 @@
-### Paid calender application
-### user model
-- []Create a User.js file in the models
-- []add the following properties name ,password ,email
-
-- **`controllers/paymentController.js`** → Handles payment logic  
-- **`routes/paymentRoutes.js`** → Defines payment-related routes  
-- **`middlewares/paidAccess.js`** → Middleware to protect paid routes  
-- **`utils/stripe.js`** → Stripe configuration  
+Awesome! Here's a clean, well-structured `README.md` template for your **Paid Calendar App** project.
 
 ---
 
-### **1️⃣ Stripe Configuration (`utils/stripe.js`)**
-```javascript
-const Stripe = require("stripe");
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+## 📅 Paid Calendar App
 
-module.exports = stripe;
+A premium calendar application built with **Node.js** that supports **authentication**, **subscription plans**, and integrates **Stripe payments** to unlock premium features.  
+Users can register, log in, manage tasks/events, and subscribe to access premium features.
+
+---
+
+## 🚀 Features
+
+- 🔐 **User Authentication (JWT + Refresh Tokens + Cookies)**
+- 💳 **Stripe Payment Integration**
+- 🗓️ **Task Management System**
+- 🏆 **Premium Subscription Handling**
+- 📨 **Webhook Listener for Stripe Events**
+- 🔄 **Token Refresh System**
+- 🛡️ **Middleware for Auth, Subscription Check & Error Handling**
+
+---
+
+## 🏗️ Tech Stack
+
+- **Backend:** Node.js, Express.js
+- **Database:** MongoDB + Mongoose
+- **Authentication:** JWT, Cookies, Bcrypt
+- **Payments:** Stripe API Integration
+- **Task Scheduling:** Node Cron (for future subscription handling, optional)
+- **Environment Variables:** dotenv
+
+---
+
+## 📁 Folder Structure
+
+```
+├── controllers
+│   ├── authController.js
+│   ├── paymentController.js
+│   └── taskController.js
+├── middleware
+│   ├── authentication.js
+│   ├── error-handler.js
+│   └── not-found.js
+├── models
+│   ├── User.js
+│   ├── Token.js
+│   └── Task.js
+├── routes
+│   ├── authRoutes.js
+│   ├── paymentRoutes.js
+│   └── taskRoutes.js
+├── utils
+│   ├── scheduleTasks.js
+│   ├── createTokenUser.js
+│   ├── jwt.js
+│   └── stripe.js
+├── .env
+├── .gitignore
+├── server.js
+└── README.md
 ```
 
 ---
 
-### **2️⃣ Payment Controller (`controllers/paymentController.js`)**
-```javascript
-const stripe = require("../utils/stripe");
-const User = require("../models/User");
+## ⚙️ Setup Instructions
 
-const createCheckoutSession = async (req, res) => {
-  const { userId } = req.body;
+1. **Clone Repository**
 
-  try {
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "subscription",
-      customer_email: req.user.email, // Ensure user is authenticated
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: "Premium Calendar Access",
-              description: "Unlock full calendar features",
-            },
-            unit_amount: 500 * 100, // $5.00 subscription fee
-            recurring: { interval: "month" },
-          },
-          quantity: 1,
-        },
-      ],
-      success_url: `${process.env.FRONTEND_URL}/payment-success`,
-      cancel_url: `${process.env.FRONTEND_URL}/payment-failed`,
-    });
+```bash
+git clone https://github.com/YOUR_USERNAME/paid-calendar-app.git
+cd paid-calendar-app
+```
 
-    res.json({ url: session.url });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+2. **Install Dependencies**
 
-const handleWebhook = async (req, res) => {
-  const sig = req.headers["stripe-signature"];
-  let event;
+```bash
+npm install
+```
 
-  try {
-    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-  } catch (err) {
-    return res.status(400).json({ error: `Webhook error: ${err.message}` });
-  }
+3. **Environment Variables**
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object;
-    const userEmail = session.customer_email;
+Create a `.env` file and add:
 
-    // Find user and update isPaid to true
-    await User.findOneAndUpdate({ email: userEmail }, { isPaid: true });
+```
+PORT=5000
+MONGO_URL=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+JWT_LIFETIME=1d
+REFRESH_TOKEN_LIFETIME=7d
+STRIPE_SECRET_KEY=your_stripe_secret_key
+STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+FRONTEND_URL=http://localhost:3000
+```
 
-    console.log(`User ${userEmail} has paid!`);
-  }
+4. **Run Server**
 
-  res.json({ received: true });
-};
-
-module.exports = { createCheckoutSession, handleWebhook };
+```bash
+npm start
 ```
 
 ---
 
-### **3️⃣ Payment Routes (`routes/paymentRoutes.js`)**
-```javascript
-const express = require("express");
-const { createCheckoutSession, handleWebhook } = require("../controllers/paymentController");
+## 🧑‍💻 API Endpoints
 
-const router = express.Router();
+### Auth Routes
 
-router.post("/create-checkout-session", createCheckoutSession);
-router.post("/webhook", express.raw({ type: "application/json" }), handleWebhook);
+| Method | Endpoint               | Description                  |
+|-------|-----------------------|------------------------------|
+| POST  | `/api/v1/auth/register` | Register new user            |
+| POST  | `/api/v1/auth/login`    | Login user                   |
+| GET   | `/api/v1/auth/logout`   | Logout user (clears cookies) |
 
-module.exports = router;
+---
+
+### Task Routes
+
+| Method | Endpoint          | Description          |
+|-------|------------------|----------------------|
+| GET   | `/api/v1/task`     | Get all tasks        |
+| POST  | `/api/v1/task`     | Create new task      |
+| PATCH | `/api/v1/task/:id` | Update task          |
+| DELETE| `/api/v1/task/:id` | Delete task          |
+
+> **Note:** Only accessible by authenticated & subscribed users.
+
+---
+
+### Payment Routes
+
+| Method | Endpoint                          | Description                    |
+|-------|----------------------------------|--------------------------------|
+| POST  | `/api/v1/payment/create-checkout` | Create Stripe checkout session|
+| POST  | `/api/v1/payment/webhook`         | Stripe webhook for subscription |
+| GET   | `/api/v1/payment/success`         | Success page after payment    |
+| GET   | `/api/v1/payment/cancel`          | Cancel page if payment fails  |
+
+---
+
+## 🔑 Premium Feature Access Logic
+
+Middleware checks if:
+
+1. User is authenticated.
+2. User has an active subscription (`isPaid` flag).
+
+If not, it returns:
+
+```
+401 Unauthorized: user must be subscribed to access this feature as it is a premium feature
 ```
 
 ---
 
-### **4️⃣ Paid Access Middleware (`middlewares/paidAccess.js`)**
-```javascript
-const CustomError = require("../errors");
+## 🌐 Stripe Integration
 
-const paidAccess = (req, res, next) => {
-  if (!req.user.isPaid) {
-    throw new CustomError.UnauthorizedError("Payment required to access this feature.");
-  }
-  next();
-};
-
-module.exports = paidAccess;
-```
+- Handles one-time or recurring subscriptions.
+- Stripe webhook listens to successful payments and updates the user’s subscription status in MongoDB.
+- Includes success & cancel pages after checkout.
 
 ---
 
-### **5️⃣ Apply to Your Main Server (`server.js` or `app.js`)**
-```javascript
-const express = require("express");
-const paymentRoutes = require("./routes/paymentRoutes");
+## 🛠️ Future Improvements
 
-const app = express();
-
-app.use(express.json()); // Required for parsing JSON bodies
-app.use("/api/payment", paymentRoutes);
-
-app.listen(5000, () => console.log("Server running on port 5000"));
-```
+- Add **Admin Dashboard** to manage users & subscriptions.
+- Integrate **email notifications**.
+- Add **free trial** option for users.
+- Add **frontend client (React/Next.js)** for better UI/UX.
 
 ---
 
-## **🔹 Summary**
-✔ **Stripe logic** is inside `controllers/paymentController.js`  
-✔ **Routes** are in `routes/paymentRoutes.js`  
-✔ **Middleware** protects paid features (`middlewares/paidAccess.js`)  
-✔ **Stripe instance** is inside `utils/stripe.js`  
+## 📄 License
 
-Now, everything is **modularized, clean, and scalable!** 🚀 Let me know if you need more refinements.
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## 🙌 Contributions
+
+PRs & Suggestions are welcome!
+
+---
+
+**Would you like me to auto-generate this `README.md` file and add it directly to your repo before pushing?** 😊
