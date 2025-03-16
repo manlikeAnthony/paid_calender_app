@@ -13,6 +13,11 @@ const TaskSchema = new mongoose.Schema({
     type: Date,
     required: [true, "must provide date"],
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   notified: {
     type: Boolean,
     default: false,

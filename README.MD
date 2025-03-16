@@ -102,20 +102,23 @@ npm start
 
 ### Auth Routes
 
-| Method | Endpoint               | Description                  |
-|-------|-----------------------|------------------------------|
-| POST  | `/api/v1/auth/register` | Register new user            |
-| POST  | `/api/v1/auth/login`    | Login user                   |
-| GET   | `/api/v1/auth/logout`   | Logout user (clears cookies) |
+| Method | Endpoint                | Description                  |
+| ------ | ----------------------- | ---------------------------- |
+| POST   | `/api/v1/auth/register` | Register new user            |
+| POST   | `/api/v1/auth/login`    | Login user                   |
+| GET    | `/api/v1/auth/logout`   | Logout user (clears cookies) |
 
 ---
 
 ### Task Routes
 
-| Method | Endpoint          | Description          |
-|-------|------------------|----------------------|
-| POST   | `/api/v1/task/schedule-task`     | schedule your tasks        |
-
+| Method | Endpoint                     | Description     |
+| ------ | ---------------------------- | --------------- |
+| GET    | `/api/v1/task`               | Get all tasks   |
+| POST   | `/api/v1/task/schedule-task` | Create new task |
+| GET    | `/api/v1/task/:id`           | Get Single Task |
+| PATCH  | `/api/v1/task/:id`           | Update task     |
+| DELETE | `/api/v1/task/:id`           | Delete task     |
 
 > **Note:** Only accessible by authenticated & subscribed users.
 
@@ -123,12 +126,12 @@ npm start
 
 ### Payment Routes
 
-| Method | Endpoint                          | Description                    |
-|-------|----------------------------------|--------------------------------|
-| POST  | `/api/v1/payment/create-checkout` | Create Stripe checkout session|
-| POST  | `/api/v1/payment/webhook`         | Stripe webhook for subscription |
-| GET   | `/api/v1/payment/success`         | Success page after payment    |
-| GET   | `/api/v1/payment/cancel`          | Cancel page if payment fails  |
+| Method | Endpoint                          | Description                     |
+| ------ | --------------------------------- | ------------------------------- |
+| POST   | `/api/v1/payment/create-checkout` | Create Stripe checkout session  |
+| POST   | `/api/v1/payment/webhook`         | Stripe webhook for subscription |
+| GET    | `/api/v1/payment/success`         | Success page after payment      |
+| GET    | `/api/v1/payment/cancel`          | Cancel page if payment fails    |
 
 ---
 
