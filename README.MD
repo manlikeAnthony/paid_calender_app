@@ -1,7 +1,3 @@
-Awesome! Here's a clean, well-structured `README.md` template for your **Paid Calendar App** project.
-
----
-
 ## 📅 Paid Calendar App
 
 A premium calendar application built with **Node.js** that supports **authentication**, **subscription plans**, and integrates **Stripe payments** to unlock premium features.  
@@ -118,10 +114,8 @@ npm start
 
 | Method | Endpoint          | Description          |
 |-------|------------------|----------------------|
-| GET   | `/api/v1/task`     | Get all tasks        |
-| POST  | `/api/v1/task`     | Create new task      |
-| PATCH | `/api/v1/task/:id` | Update task          |
-| DELETE| `/api/v1/task/:id` | Delete task          |
+| POST   | `/api/v1/task/schedule-task`     | schedule your tasks        |
+
 
 > **Note:** Only accessible by authenticated & subscribed users.
 
@@ -181,5 +175,3 @@ This project is licensed under the [MIT License](LICENSE).
 PRs & Suggestions are welcome!
 
 ---
-
-**Would you like me to auto-generate this `README.md` file and add it directly to your repo before pushing?** 😊
