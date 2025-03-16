@@ -4,10 +4,11 @@ const { StatusCodes } = require("http-status-codes");
 const checkPermissions = require("../utils/checkPermissions");
 
 const scheduleTask = async (req, res) => {
-  const { email, title, date } = req.body;
-  if (!email || !title || !date) {
+  const {title, date } = req.body;
+  if (!title || !date) {
     throw new CustomError.BadRequestError("must provide all values");
   }
+  req.body.email = req.user.email;
   req.body.user = req.user.userId;
   const task = await Task.create(req.body);
   res.status(StatusCodes.OK).json({ msg: "task scheduled successfully", task });
