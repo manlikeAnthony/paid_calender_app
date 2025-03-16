@@ -33,7 +33,7 @@ const authenticateUser = async (req, res, next) => {
 
 const isSubscribed = async (req, res, next) => {
   if (!req.user.isPaid) {
-    throw new CustomError.UnauthenticatedError("user must be subscribed to access this feature as it is a premium feature");
+    throw new CustomError.UnauthenticatedError("user must be subscribed to access this feature as it is a premium feature , no broke users allowed");
   }
   next();
 };
