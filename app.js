@@ -1,6 +1,6 @@
 require('dotenv').config()
 require('express-async-errors')
-require('./utils/scheduleTasks')
+require('./utils/scheduleTasks') // if you dont add this scheduleTask cannot work ,if you like pray nothing for you but error
 
 const express = require('express')
 const app = express();
