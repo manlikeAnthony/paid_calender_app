@@ -78,7 +78,7 @@ const login = async (req, res) => {
   let message = "";
   if (!user.isPaid) {
     message =
-      "Dear sir or ma apparently you are  yet to subscribe ,your broke ass will be permitted to login but thats all";
+      "Dear user , you are not a premium user ,no broke users  are allowed access to premium features,thank you";
   }else{
     message = "welcome premium user"
   }

@@ -6,9 +6,10 @@ cron.schedule("* * * * *", async () => {
   const now = new Date(Date.now());
   const tasks = await Task.find({ date : { $lte: now }, notified: false });
   for (const task of tasks) {
-    const message = `Reminder : your task ${task.title} is due now`;
+    const message = `Reminder : your task "${task.title}" is due now`;
     await sendEmail({ to: task.email, subject: "Task Reminder",html: message });
     task.notified = true;
     await task.save();
   }
 });
+// really hope i did this well
