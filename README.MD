@@ -87,7 +87,6 @@ JWT_LIFETIME=1d
 REFRESH_TOKEN_LIFETIME=7d
 STRIPE_SECRET_KEY=your_stripe_secret_key
 STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
-FRONTEND_URL=http://localhost:3000
 ```
 
 4. **Run Server**

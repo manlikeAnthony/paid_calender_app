@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-const { createCheckout, webhook } = require("../controllers/paymentController");
+const { createCheckout} = require("../controllers/paymentController");
+const {authenticateUser} = require('../middleware/authentication')
 
-
-router.post("/create-checkout", createCheckout);
+router.post("/create-checkout", authenticateUser,createCheckout);
 
 router.get('/success' , (req,res)=>{
     res.send('<h1>You were successful in paying</h1>')

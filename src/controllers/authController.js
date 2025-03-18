@@ -1,6 +1,6 @@
+const crypto = require("crypto");
 const CustomError = require("../errors");
 const User = require("../models/User");
-const crypto = require("crypto");
 const {
   attachCookiesToResponse,
   createTokenUser,
@@ -11,14 +11,16 @@ const {
 } = require("../utils");
 const Token = require("../models/Token");
 const { StatusCodes } = require("http-status-codes");
+const {registerValidator,loginValidator} = require('../validator/validate')
 
 const register = async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !password || !email) {
-    throw new CustomError.BadRequestError(
-      "must provide all the required values"
-    );
+  const { email, password, name } = req.body; 
+  const {error,value} = registerValidator(req.body);
+  if(error){
+    console.log(error);
+    res.status(StatusCodes.BAD_REQUEST).json({msg : error.details.map((details)=> details.message)})
   }
+
   const alreadyHasAccount = await User.findOne({ email });
   if (alreadyHasAccount) {
     throw new CustomError.BadRequestError(
@@ -43,6 +45,7 @@ const register = async (req, res) => {
     msg: "Success , please check your email to verify account",
   });
 };
+
 const verifyEmail = async (req, res) => {
   const { verificationToken, email } = req.body;
   const user = await User.findOne({ email });
@@ -60,10 +63,13 @@ const verifyEmail = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: "Email successfully Verified" });
 };
 const login = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    throw new CustomError.BadRequestError("must provide all values");
+  const {email , password} = req.body;
+  const {error,value} = loginValidator(req.body);
+  if(error){
+    console.log(error);
+    res.status(StatusCodes.BAD_REQUEST).json({msg : error.details.map((details)=> details.message)})
   }
+
   const user = await User.findOne({ email });
   if (!user) {
     throw new CustomError.UnauthenticatedError("invalid credentials");
@@ -79,8 +85,8 @@ const login = async (req, res) => {
   if (!user.isPaid) {
     message =
       "Dear user , you are not a premium user ,no broke users  are allowed access to premium features,thank you";
-  }else{
-    message = "welcome premium user"
+  } else {
+    message = "welcome premium user";
   }
   const tokenUser = createTokenUser(user);
 
@@ -105,7 +111,6 @@ const login = async (req, res) => {
   attachCookiesToResponse({ res, user: tokenUser, refreshToken });
   res.status(StatusCodes.OK).json({ user: tokenUser, msg: message });
 };
-
 
 const logout = async (req, res) => {
   await Token.findOneAndDelete({ user: req.user.userId });

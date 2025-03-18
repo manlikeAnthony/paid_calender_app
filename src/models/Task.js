@@ -7,7 +7,7 @@ const TaskSchema = new mongoose.Schema({
   },
   title: {
     type: String,
-    required: [true, "must provide email"],
+    required: [true, "must provide title"],
   },
   date: {
     type: Date,
@@ -21,7 +21,19 @@ const TaskSchema = new mongoose.Schema({
   notified: {
     type: Boolean,
     default: false,
+  },
+  archived:{
+    type:Boolean,
+    default:false
+  },
+  flagged:{
+    type:String,
+    enum :{
+      values:['red','orange','green', 'none'],
+      message:'{VALUE} is not supported color'
+    },
+    default : 'none'
   }
-});
+},{timestamps:true});
 
 module.exports = mongoose.model("Task", TaskSchema);

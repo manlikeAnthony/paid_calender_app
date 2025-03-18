@@ -9,7 +9,7 @@ cron.schedule("* * * * *", async () => {
     const message = `Reminder : your task "${task.title}" is due now`;
     await sendEmail({ to: task.email, subject: "Task Reminder",html: message });
     task.notified = true;
+    task.archived = true;
     await task.save();
   }
 });
-// really hope i did this well
