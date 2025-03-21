@@ -24,7 +24,7 @@ const register = async (req, res) => {
   const alreadyHasAccount = await User.findOne({ email });
   if (alreadyHasAccount) {
     throw new CustomError.BadRequestError(
-      "You already have an account here try to login instead"
+      "You already have an account here try logging in"
     );
   }
   const verificationToken = crypto.randomBytes(40).toString("hex");
