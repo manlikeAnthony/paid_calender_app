@@ -8,6 +8,12 @@ const PORT = process.env.PORT || 3000;
 //pakages
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
+const rateLimiter = require('express-rate-limit');
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const cors = require('cors');
+const mongoSanitize = require('express-mongo-sanitize');
+
 // database
 const connectDB = require("./database/connect");
 //middleware
@@ -18,11 +24,26 @@ const { webhook } = require("./controllers/paymentController");
 const authRouter = require("./routes/authRoutes");
 const taskRouter = require("./routes/taskRoutes");
 const paymentRouter = require("./routes/paymentRoutes");
+
 app.post(
   "/api/v1/payment/webhook",
   express.raw({ type: "application/json" }),
   webhook
 );
+
+app.set('trust proxy', 1);
+app.use(
+  rateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 60,
+  })
+);
+
+app.use(helmet());
+app.use(cors());
+app.use(xss());
+app.use(mongoSanitize());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.JWT_SECRET));
